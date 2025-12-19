@@ -35,6 +35,24 @@ class Lector {
     // Fusion des options
     this.options = { ...this.defaults, ...options };
     
+    // Lier les méthodes au contexte de l'instance
+    this.togglePlay = this.togglePlay.bind(this);
+    this.toggleMute = this.toggleMute.bind(this);
+    this.toggleFullscreen = this.toggleFullscreen.bind(this);
+    this.setVolume = this.setVolume.bind(this);
+    this.seek = this.seek.bind(this);
+    this.onPlay = this.onPlay.bind(this);
+    this.onPause = this.onPause.bind(this);
+    this.onVolumeChange = this.onVolumeChange.bind(this);
+    this.updateProgress = this.updateProgress.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.showControls = this.showControls.bind(this);
+    this.hideControls = this.hideControls.bind(this);
+    this.startHideControlsTimer = this.startHideControlsTimer.bind(this);
+    this.resetHideControlsTimer = this.resetHideControlsTimer.bind(this);
+    this.showSeekFeedback = this.showSeekFeedback.bind(this);
+    this.seekRelative = this.seekRelative.bind(this);
+
     // Initialisation
     this.container = document.querySelector(selector);
     if (!this.container) {
