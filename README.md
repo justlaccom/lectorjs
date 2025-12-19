@@ -1,6 +1,17 @@
-# LectorJS
+<div align="center">
+  <h1>LectorJS</h1>
+  <p>🎬 Une bibliothèque JavaScript légère et personnalisable pour créer des lecteurs vidéo modernes et élégants pour le web.</p>
+  
+  [![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/justlaccom/lectorjs)
+  [![jsDelivr](https://data.jsdelivr.com/v1/package/gh/justlaccom/lectorjs/badge)](https://www.jsdelivr.com/package/gh/justlaccom/lectorjs)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  
+  <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white" alt="HTML5">
+  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white" alt="CSS3">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black" alt="JavaScript">
+</div>
 
-Une bibliothèque JavaScript légère et personnalisable pour créer des lecteurs vidéo modernes et élégants pour le web.
+## 🌟 Fonctionnalités
 
 ## Fonctionnalités
 
@@ -13,15 +24,30 @@ Une bibliothèque JavaScript légère et personnalisable pour créer des lecteur
 - Compatible avec tous les navigateurs modernes
 - Léger et facile à intégrer
 
-## Installation
+## 🚀 Installation
 
-### Via CDN (méthode la plus simple)
+### Via CDN (recommandé)
 
-Ajoutez ceci à votre fichier HTML :
+Ajoutez simplement cette balise script dans le `<head>` de votre page HTML :
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/votre-compte/lectorjs/dist/lector.min.css">
-<script src="https://cdn.jsdelivr.net/gh/votre-compte/lectorjs/dist/lector.min.js"></script>
+<!-- Dernière version -->
+<script src="https://cdn.jsdelivr.net/gh/justlaccom/lectorjs/dist/lector.min.js"></script>
+
+<!-- Version spécifique (recommandé pour la production) -->
+<!-- <script src="https://cdn.jsdelivr.net/gh/justlaccom/lectorjs@v1.0.0/dist/lector.min.js"></script> -->
+```
+
+### Installation via npm
+
+```bash
+npm install @justlaccom/lectorjs
+```
+
+Puis importez-le dans votre projet :
+
+```javascript
+import Lector from '@justlaccom/lectorjs';
 ```
 
 ### Installation via npm
@@ -36,7 +62,53 @@ Puis importez-le dans votre projet :
 import Lector from 'lectorjs';
 ```
 
-## Utilisation de base
+## 🎮 Démarrage rapide
+
+### HTML
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LectorJS Demo</title>
+    <script src="https://cdn.jsdelivr.net/gh/justlaccom/lectorjs/dist/lector.min.js"></script>
+    <style>
+        body { 
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .video-container {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>LectorJS Demo</h1>
+    <div id="my-video" class="video-container"></div>
+
+    <script>
+        // Initialisation du lecteur
+        const player = new Lector('#my-video', {
+            width: '100%',
+            height: '450px',
+            colors: {
+                primary: '#2196F3',
+                secondary: '#FF4081',
+                text: '#ffffff',
+                background: '#1a1a1a'
+            }
+        });
+
+        // Configuration de la source vidéo
+        player.setSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+    </script>
+</body>
+</html>
+```
+
+## 📚 Documentation complète
 
 ### HTML
 
@@ -80,7 +152,7 @@ player.setSource('chemin/vers/votre-video.mp4');
 // player.setAutoplay(true);
 ```
 
-## Options de configuration
+## ⚙️ Options de configuration
 
 | Option | Type | Défaut | Description |
 |--------|------|---------|-------------|
@@ -102,7 +174,7 @@ player.setSource('chemin/vers/votre-video.mp4');
 | `preload` | string | `'metadata'` | Préchargement de la vidéo (none, metadata, auto) |
 | `poster` | string | `''` | URL de l'image d'aperçu |
 
-## Méthodes disponibles
+## 🛠 Méthodes disponibles
 
 - `play()`: Lance la lecture de la vidéo
 - `pause()`: Met la lecture en pause
@@ -115,7 +187,7 @@ player.setSource('chemin/vers/votre-video.mp4');
 - `setLoop(loop)`: Active/désactive la lecture en boucle
 - `setMuted(muted)`: Active/désactive le mode silencieux
 
-## Événements
+## 🔔 Événements
 
 Vous pouvez écouter les événements natifs de la balise `<video>` :
 
@@ -136,9 +208,35 @@ videoElement.addEventListener('ended', () => {
 });
 ```
 
-## Personnalisation
+## 🎨 Personnalisation
 
-### Thèmes personnalisés
+### Thèmes prédéfinis
+
+```javascript
+// Thème bleu (par défaut)
+const blueTheme = {
+    primary: '#2196F3',
+    secondary: '#FF4081',
+    text: '#ffffff',
+    background: '#1a1a1a'
+};
+
+// Thème vert
+const greenTheme = {
+    primary: '#4CAF50',
+    secondary: '#8BC34A',
+    text: '#ffffff',
+    background: '#1a1a1a'
+};
+
+// Utilisation
+const player = new Lector('#my-video', {
+    colors: greenTheme,
+    // autres options...
+});
+```
+
+### Personnalisation avancée
 
 Vous pouvez facilement personnaliser l'apparence du lecteur en modifiant les couleurs :
 
@@ -168,14 +266,45 @@ Vous pouvez également ajouter vos propres styles CSS en ciblant les classes du 
 }
 ```
 
-## Compatibilité
+## 🌍 Compatibilité
 
 LectorJS est compatible avec tous les navigateurs modernes :
-- Chrome (dernière version)
-- Firefox (dernière version)
-- Safari (dernière version)
-- Edge (dernière version)
-- Opera (dernière version)
+
+| Navigateur | Version minimale |
+|------------|------------------|
+| Chrome     | 60+              |
+| Firefox    | 55+              |
+| Safari     | 11+              |
+| Edge       | 16+              |
+| Opera      | 47+              |
+| iOS Safari | 11+              |
+| Android    | 6.0+             |
+
+## 🤝 Contribuer
+
+Les contributions sont les bienvenues ! Voici comment contribuer :
+
+1. Forkez le projet
+2. Créez votre branche de fonctionnalité (`git checkout -b feature/AmazingFeature`)
+3. Committez vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. Poussez vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une Pull Request
+
+## 📄 Licence
+
+Distribué sous la licence MIT. Voir `LICENSE` pour plus d'informations.
+
+## 🙏 Remerciements
+
+- Icônes par [Feather Icons](https://feathericons.com/)
+- Polices par [Google Fonts](https://fonts.google.com/)
+- Vidéos de démonstration par [Sample Videos](https://sample-videos.com/)
+
+---
+
+<div align="center">
+  Fait avec ❤️ par <a href="https://github.com/justlaccom">just_laccom</a>
+</div>
 
 ## Licence
 
