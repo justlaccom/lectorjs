@@ -5,6 +5,8 @@ class Lector {
       width: '100%',
       height: 'auto',
       theme: 'default',
+      hideControlsTimeout: 3000, // Délai avant masquage des contrôles (en ms)
+      seekStep: 10, // Nombre de secondes pour l'avance/retour rapide
       colors: {
         primary: '#2196F3',
         secondary: '#FF4081',
@@ -25,6 +27,10 @@ class Lector {
       preload: 'metadata',
       poster: ''
     };
+    
+    // Variables d'état
+    this.isControlsVisible = true;
+    this.controlsTimeout = null;
 
     // Fusion des options
     this.options = { ...this.defaults, ...options };
@@ -44,6 +50,9 @@ class Lector {
     this.createPlayer();
     this.setupEventListeners();
     this.applyTheme();
+    
+    // Démarrer le minuteur de masquage des contrôles
+    this.startHideControlsTimer();
   }
 
   createPlayer() {
@@ -56,6 +65,8 @@ class Lector {
     this.player.style.position = 'relative';
     this.player.style.overflow = 'hidden';
     this.player.style.borderRadius = '8px';
+    this.player.style.userSelect = 'none';
+    this.player.style.touchAction = 'manipulation';
 
     // Création de la vidéo
     this.video = document.createElement('video');
@@ -71,15 +82,15 @@ class Lector {
     }
 
     // Création des contrôles
-    const controls = document.createElement('div');
-    controls.className = 'lector-controls';
-    controls.style.position = 'absolute';
-    controls.style.bottom = '0';
-    controls.style.left = '0';
-    controls.style.right = '0';
-    controls.style.padding = '10px';
-    controls.style.background = 'linear-gradient(transparent, rgba(0,0,0,0.7))';
-    controls.style.transition = 'opacity 0.3s';
+    this.controls = document.createElement('div');
+    this.controls.className = 'lector-controls';
+    this.controls.style.position = 'absolute';
+    this.controls.style.bottom = '0';
+    this.controls.style.left = '0';
+    this.controls.style.right = '0';
+    this.controls.style.padding = '10px';
+    this.controls.style.background = 'linear-gradient(transparent, rgba(0,0,0,0.7))';
+    this.controls.style.zIndex = '10';
 
     // Barre de progression
     if (this.options.controls.progress) {
@@ -237,17 +248,144 @@ class Lector {
     // Assemblage des contrôles
     mainControls.appendChild(leftControls);
     mainControls.appendChild(rightControls);
-    controls.appendChild(mainControls);
+    this.controls.appendChild(mainControls);
 
     // Ajout des éléments au lecteur
     this.player.appendChild(this.video);
-    this.player.appendChild(controls);
+    this.player.appendChild(this.controls);
 
     // Remplacement du conteneur original par le lecteur
     this.container.innerHTML = '';
     this.container.appendChild(this.player);
   }
 
+  // Gestion du minuteur de masquage des contrôles
+  startHideControlsTimer() {
+    if (this.controlsTimeout) {
+      clearTimeout(this.controlsTimeout);
+    }
+    
+    this.controlsTimeout = setTimeout(() => {
+      this.hideControls();
+    }, this.options.hideControlsTimeout);
+  }
+  
+  resetHideControlsTimer() {
+    this.showControls();
+    this.startHideControlsTimer();
+  }
+  
+  showControls() {
+    if (!this.isControlsVisible) {
+      this.controls.style.opacity = '1';
+      this.controls.style.pointerEvents = 'auto';
+      this.isControlsVisible = true;
+    }
+  }
+  
+  hideControls() {
+    if (this.isControlsVisible && !this.video.paused) {
+      this.controls.style.opacity = '0';
+      this.controls.style.pointerEvents = 'none';
+      this.isControlsVisible = false;
+    }
+  }
+  
+  // Gestion de la navigation au clavier
+  handleKeyDown(e) {
+    const key = e.key.toLowerCase();
+    
+    switch(key) {
+      case ' ':
+      case 'k':
+        e.preventDefault();
+        this.togglePlay();
+        this.resetHideControlsTimer();
+        break;
+      case 'm':
+        this.toggleMute();
+        this.resetHideControlsTimer();
+        break;
+      case 'f':
+        this.toggleFullscreen();
+        this.resetHideControlsTimer();
+        break;
+      case 'arrowleft':
+        e.preventDefault();
+        this.seekRelative(-this.options.seekStep);
+        this.showSeekFeedback(-this.options.seekStep);
+        this.resetHideControlsTimer();
+        break;
+      case 'arrowright':
+        e.preventDefault();
+        this.seekRelative(this.options.seekStep);
+        this.showSeekFeedback(this.options.seekStep);
+        this.resetHideControlsTimer();
+        break;
+      case 'arrowup':
+        e.preventDefault();
+        this.setVolume(Math.min(1, this.video.volume + 0.1));
+        this.resetHideControlsTimer();
+        break;
+      case 'arrowdown':
+        e.preventDefault();
+        this.setVolume(Math.max(0, this.video.volume - 0.1));
+        this.resetHideControlsTimer();
+        break;
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+        const percent = parseInt(key) / 10;
+        this.video.currentTime = this.video.duration * percent;
+        this.resetHideControlsTimer();
+        break;
+    }
+  }
+  
+  // Affiche un retour visuel lors du défilement
+  showSeekFeedback(seconds) {
+    const feedback = document.createElement('div');
+    feedback.className = 'lector-seek-feedback';
+    feedback.textContent = (seconds > 0 ? '+' : '') + seconds + 's';
+    feedback.style.position = 'absolute';
+    feedback.style.top = '50%';
+    feedback.style.left = '50%';
+    feedback.style.transform = 'translate(-50%, -50%)';
+    feedback.style.background = 'rgba(0, 0, 0, 0.7)';
+    feedback.style.color = 'white';
+    feedback.style.padding = '10px 20px';
+    feedback.style.borderRadius = '20px';
+    feedback.style.fontSize = '24px';
+    feedback.style.fontWeight = 'bold';
+    feedback.style.pointerEvents = 'none';
+    feedback.style.zIndex = '100';
+    feedback.style.transition = 'opacity 0.5s';
+    
+    this.player.appendChild(feedback);
+    
+    // Animation
+    setTimeout(() => {
+      feedback.style.opacity = '0';
+      setTimeout(() => {
+        if (feedback.parentNode) {
+          feedback.remove();
+        }
+      }, 500);
+    }, 1000);
+  }
+  
+  // Avance/recule la vidéo d'un certain nombre de secondes
+  seekRelative(seconds) {
+    this.video.currentTime = Math.max(0, Math.min(this.video.currentTime + seconds, this.video.duration));
+  }
+  
   setupEventListeners() {
     // Événements de la vidéo
     this.video.addEventListener('timeupdate', this.updateProgress.bind(this));
@@ -256,6 +394,42 @@ class Lector {
     this.video.addEventListener('play', this.onPlay.bind(this));
     this.video.addEventListener('pause', this.onPause.bind(this));
     this.video.addEventListener('volumechange', this.onVolumeChange.bind(this));
+    
+    // Détection de l'inactivité
+    this.player.addEventListener('mousemove', this.resetHideControlsTimer.bind(this));
+    this.player.addEventListener('mouseenter', this.showControls.bind(this));
+    this.player.addEventListener('mouseleave', () => {
+      if (!this.video.paused) {
+        this.hideControls();
+      }
+    });
+    
+    // Navigation au clavier
+    document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    
+    // Événements tactiles
+    let touchStartX = 0;
+    let touchStartTime = 0;
+    
+    this.player.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartTime = Date.now();
+      this.showControls();
+    });
+    
+    this.player.addEventListener('touchend', (e) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndTime = Date.now();
+      const deltaX = touchEndX - touchStartX;
+      const deltaTime = touchEndTime - touchStartTime;
+      
+      // Balayage rapide pour avancer/reculer
+      if (Math.abs(deltaX) > 50 && deltaTime < 300) {
+        const seconds = deltaX > 0 ? this.options.seekStep : -this.options.seekStep;
+        this.seekRelative(seconds);
+        this.showSeekFeedback(seconds);
+      }
+    });
 
     // Contrôles
     if (this.playPauseBtn) {
@@ -292,8 +466,10 @@ class Lector {
   togglePlay() {
     if (this.video.paused) {
       this.play();
+      this.startHideControlsTimer();
     } else {
       this.pause();
+      this.showControls();
     }
   }
 
@@ -333,6 +509,7 @@ class Lector {
     const rect = this.progress.parentElement.getBoundingClientRect();
     const pos = (e.clientX - rect.left) / rect.width;
     this.video.currentTime = pos * this.video.duration;
+    this.resetHideControlsTimer();
   }
 
   setVolume() {
@@ -394,6 +571,20 @@ class Lector {
         display: none !important;
       }
       
+      .lector-controls {
+        transition: opacity 0.3s ease-out;
+        opacity: 1;
+      }
+      
+      .lector-controls.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      .lector-progress-container {
+        transition: height 0.2s ease;
+      }
+      
       .lector-progress-container:hover .lector-progress {
         height: 6px;
       }
@@ -427,12 +618,40 @@ class Lector {
         opacity: 1;
       }
       
+      button {
+        transition: background-color 0.2s, transform 0.1s;
+      }
+      
+      button:active {
+        transform: scale(0.95);
+      }
+      
       button:hover {
         background-color: rgba(255, 255, 255, 0.1) !important;
       }
       
+      .lector-volume-slider {
+        transition: opacity 0.3s;
+      }
+      
       .lector-volume-slider:hover {
         opacity: 1 !important;
+      }
+      
+      @media (max-width: 600px) {
+        .lector-controls {
+          padding: 5px !important;
+        }
+        
+        .lector-time {
+          font-size: 12px !important;
+        }
+        
+        button {
+          padding: 2px !important;
+          min-width: 28px !important;
+          height: 28px !important;
+        }
       }
     `;
     document.head.appendChild(style);
