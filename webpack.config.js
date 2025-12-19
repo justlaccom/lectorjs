@@ -7,10 +7,13 @@ module.exports = {
   output: {
     filename: 'lector.min.js',
     path: path.resolve(__dirname, 'dist'),
-    library: 'Lector',
-    libraryTarget: 'umd',
-    globalObject: 'this',
-    umdNamedDefine: true
+    library: {
+      name: 'Lector',
+      type: 'umd',
+      umdNamedDefine: true,
+      export: 'default'
+    },
+    globalObject: 'this'
   },
   module: {
     rules: [
