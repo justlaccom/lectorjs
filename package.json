@@ -1,0 +1,44 @@
+{
+  "name": "@just_laccom/lectorjs",
+  "version": "1.0.0",
+  "description": "A customizable and modern video player library for the web",
+  "main": "dist/lector.min.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development --watch",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "video",
+    "player",
+    "custom",
+    "ui",
+    "javascript",
+    "html5",
+    "video-player",
+    "web-component"
+  ],
+  "author": "just_laccom laccompg78@gmail.com (https://github.com/justlaccom)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justlaccom/lectorjs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/justlaccom/lectorjs/issues"
+  },
+  "homepage": "https://github.com/justlaccom/lectorjs#readme",
+  "files": [
+    "dist/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "css-loader": "^7.1.2",
+    "style-loader": "^4.0.0",
+    "terser-webpack-plugin": "^5.3.16",
+    "webpack": "^5.104.1",
+    "webpack-cli": "^6.0.1"
+  }
+}
