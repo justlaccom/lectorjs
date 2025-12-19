@@ -447,7 +447,9 @@ class Lector {
     }
 
     if (this.volumeSlider) {
-      this.volumeSlider.addEventListener('input', this.setVolume.bind(this));
+      this.volumeSlider.addEventListener('input', (e) => {
+        this.setVolume(parseFloat(e.target.value));
+      });
     }
 
     if (this.fullscreenBtn) {
@@ -455,46 +457,25 @@ class Lector {
     }
   }
 
-  // Méthodes de contrôle
-  play() {
-    this.video.play();
-  }
-
-  pause() {
-    this.video.pause();
-  }
-
-  togglePlay() {
-    if (this.video.paused) {
-      this.play();
-      this.startHideControlsTimer();
-    } else {
-      this.pause();
-      this.showControls();
-    }
-  }
-
   onPlay() {
-    if (this.playPauseBtn) {
-      this.playPauseBtn.innerHTML = this.icons.pause;
-    }
+    if (!this.playPauseBtn || !this.video) return;
+    this.playPauseBtn.innerHTML = this.icons.pause;
   }
 
   onPause() {
-    if (this.playPauseBtn) {
-      this.playPauseBtn.innerHTML = this.icons.play;
-    }
+    if (!this.playPauseBtn || !this.video) return;
+    this.playPauseBtn.innerHTML = this.icons.play;
   }
 
   updateProgress() {
-    if (!this.progress) return;
+    if (!this.progress || !this.video) return;
     const percent = (this.video.currentTime / this.video.duration) * 100;
     this.progress.style.width = `${percent}%`;
     this.updateTimeDisplay();
   }
 
   updateTimeDisplay() {
-    if (!this.timeDisplay) return;
+    if (!this.timeDisplay || !this.video) return;
     
     const formatTime = (seconds) => {
       const minutes = Math.floor(seconds / 60);
@@ -506,57 +487,56 @@ class Lector {
   }
 
   seek(e) {
-    if (!this.progress) return;
+    if (!this.progress || !this.video) return;
     const rect = this.progress.parentElement.getBoundingClientRect();
     const pos = (e.clientX - rect.left) / rect.width;
     this.video.currentTime = pos * this.video.duration;
     this.resetHideControlsTimer();
   }
 
-  setVolume() {
-    if (!this.volumeSlider) return;
-    this.video.volume = this.volumeSlider.value;
+  setVolume(volume) {
+    if (!this.video) return this;
+    this.video.volume = Math.max(0, Math.min(1, volume));
     this.updateVolumeIcon();
+    return this;
   }
 
   toggleMute() {
+    if (!this.video) return this;
     this.video.muted = !this.video.muted;
-    if (this.volumeSlider) {
-      this.volumeSlider.value = this.video.muted ? 0 : this.video.volume;
-    }
     this.updateVolumeIcon();
+    return this;
   }
 
   onVolumeChange() {
-    if (this.volumeSlider) {
-      this.volumeSlider.value = this.video.muted ? 0 : this.video.volume;
-    }
     this.updateVolumeIcon();
   }
 
+  updatePlayPauseIcon() {
+    if (!this.playPauseBtn || !this.video) return;
+    this.playPauseBtn.innerHTML = this.video.paused ? this.icons.play : this.icons.pause;
+  }
+
   updateVolumeIcon() {
-    if (!this.volumeBtn) return;
-    
-    if (this.video.muted || this.video.volume === 0) {
-      this.volumeBtn.innerHTML = this.icons.volumeMute;
-    } else {
-      this.volumeBtn.innerHTML = this.icons.volume;
-    }
+    if (!this.volumeBtn || !this.video) return;
+    this.volumeBtn.innerHTML = this.video.muted || this.video.volume === 0 ? this.icons.volumeMute : this.icons.volume;
   }
 
   toggleFullscreen() {
     if (!document.fullscreenElement) {
       this.player.requestFullscreen().then(() => {
-        this.fullscreenBtn.innerHTML = this.icons.fullscreenExit;
+        if (this.fullscreenBtn) {
+          this.fullscreenBtn.innerHTML = this.icons.fullscreenExit;
+        }
       }).catch(err => {
         console.error(`Erreur lors du passage en plein écran: ${err.message}`);
       });
     } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().then(() => {
+      document.exitFullscreen().then(() => {
+        if (this.fullscreenBtn) {
           this.fullscreenBtn.innerHTML = this.icons.fullscreen;
-        });
-      }
+        }
+      });
     }
   }
 
@@ -658,40 +638,47 @@ class Lector {
     document.head.appendChild(style);
   }
 
-  // Méthodes publiques
-  setSource(src) {
-    this.video.src = src;
+  // Méthodes de contrôle du lecteur
+  play() {
+    if (this.video) {
+      this.video.play().catch(error => {
+        console.error('Erreur lors de la lecture de la vidéo:', error);
+      });
+      this.updatePlayPauseIcon();
+    }
     return this;
   }
 
-  setPoster(poster) {
-    this.video.poster = poster;
-    return this;
-  }
-
-  setAutoplay(autoplay) {
-    this.video.autoplay = autoplay;
+  pause() {
+    if (this.video) {
+      this.video.pause();
+      this.updatePlayPauseIcon();
+    }
     return this;
   }
 
   setLoop(loop) {
-    this.video.loop = loop;
+    if (this.video) {
+      this.video.loop = loop;
+    }
     return this;
   }
 
   setMuted(muted) {
-    this.video.muted = muted;
-    if (this.volumeSlider) {
-      this.volumeSlider.value = muted ? 0 : this.video.volume;
+    if (this.video) {
+      this.video.muted = muted;
+      if (this.volumeSlider) {
+        this.volumeSlider.value = muted ? 0 : this.video.volume;
+      }
+      this.updateVolumeIcon();
     }
-    this.updateVolumeIcon();
     return this;
   }
 
   setVolume(volume) {
-    if (typeof volume === 'number' && volume >= 0 && volume <= 1) {
-      this.video.volume = volume;
+    if (this.video) {
       this.video.muted = false;
+      this.video.volume = Math.max(0, Math.min(1, volume));
       if (this.volumeSlider) {
         this.volumeSlider.value = volume;
       }
