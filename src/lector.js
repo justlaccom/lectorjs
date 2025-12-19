@@ -118,31 +118,37 @@ class Lector {
     leftControls.style.alignItems = 'center';
     leftControls.style.gap = '10px';
 
+    // Icônes SVG
+    const icons = {
+      play: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>',
+      pause: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>',
+      volume: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon></svg>',
+      volumeMute: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>',
+      fullscreen: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>',
+      fullscreenExit: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path></svg>'
+    };
+
     // Bouton lecture/pause
     if (this.options.controls.playPause) {
       this.playPauseBtn = document.createElement('button');
       this.playPauseBtn.className = 'lector-play-pause';
-      this.playPauseBtn.innerHTML = '▶';
+      this.playPauseBtn.innerHTML = icons.play;
       this.playPauseBtn.style.background = 'none';
       this.playPauseBtn.style.border = 'none';
       this.playPauseBtn.style.color = this.options.colors.text;
-      this.playPauseBtn.style.fontSize = '20px';
-      this.playPauseBtn.style.cursor = 'pointer';
-      this.playPauseBtn.style.padding = '5px';
-      this.playPauseBtn.style.borderRadius = '4px';
+      this.playPauseBtn.style.width = '32px';
+      this.playPauseBtn.style.height = '32px';
       this.playPauseBtn.style.display = 'flex';
       this.playPauseBtn.style.alignItems = 'center';
       this.playPauseBtn.style.justifyContent = 'center';
+      this.playPauseBtn.style.borderRadius = '4px';
       this.playPauseBtn.style.transition = 'background-color 0.2s';
+      this.playPauseBtn.style.cursor = 'pointer';
       
       this.playPauseBtn.addEventListener('mouseenter', () => {
         this.playPauseBtn.style.backgroundColor = 'rgba(255,255,255,0.1)';
       });
       
-      this.playPauseBtn.addEventListener('mouseleave', () => {
-        this.playPauseBtn.style.backgroundColor = 'transparent';
-      });
-
       leftControls.appendChild(this.playPauseBtn);
     }
 
@@ -174,7 +180,7 @@ class Lector {
 
       this.volumeBtn = document.createElement('button');
       this.volumeBtn.className = 'lector-volume-btn';
-      this.volumeBtn.innerHTML = '🔊';
+      this.volumeBtn.innerHTML = icons.volume;
       this.volumeBtn.style.background = 'none';
       this.volumeBtn.style.border = 'none';
       this.volumeBtn.style.color = this.options.colors.text;
@@ -212,18 +218,18 @@ class Lector {
     if (this.options.controls.fullscreen) {
       this.fullscreenBtn = document.createElement('button');
       this.fullscreenBtn.className = 'lector-fullscreen';
-      this.fullscreenBtn.innerHTML = '⛶';
+      this.fullscreenBtn.innerHTML = icons.fullscreen;
       this.fullscreenBtn.style.background = 'none';
       this.fullscreenBtn.style.border = 'none';
       this.fullscreenBtn.style.color = this.options.colors.text;
-      this.fullscreenBtn.style.fontSize = '16px';
-      this.fullscreenBtn.style.cursor = 'pointer';
-      this.fullscreenBtn.style.padding = '5px';
-      this.fullscreenBtn.style.borderRadius = '4px';
+      this.fullscreenBtn.style.width = '32px';
+      this.fullscreenBtn.style.height = '32px';
       this.fullscreenBtn.style.display = 'flex';
       this.fullscreenBtn.style.alignItems = 'center';
       this.fullscreenBtn.style.justifyContent = 'center';
-      this.fullscreenBtn.style.transition = 'background-color 0.2s';
+      this.fullscreenBtn.style.borderRadius = '4px';
+      this.fullscreenBtn.style.transition = 'all 0.2s';
+      this.fullscreenBtn.style.cursor = 'pointer';
 
       rightControls.appendChild(this.fullscreenBtn);
     }
@@ -293,13 +299,13 @@ class Lector {
 
   onPlay() {
     if (this.playPauseBtn) {
-      this.playPauseBtn.textContent = '❚❚';
+      this.playPauseBtn.innerHTML = this.icons.pause;
     }
   }
 
   onPause() {
     if (this.playPauseBtn) {
-      this.playPauseBtn.textContent = '▶';
+      this.playPauseBtn.innerHTML = this.icons.play;
     }
   }
 
@@ -354,24 +360,24 @@ class Lector {
     if (!this.volumeBtn) return;
     
     if (this.video.muted || this.video.volume === 0) {
-      this.volumeBtn.textContent = '🔇';
-    } else if (this.video.volume < 0.3) {
-      this.volumeBtn.textContent = '🔈';
-    } else if (this.video.volume < 0.7) {
-      this.volumeBtn.textContent = '🔉';
+      this.volumeBtn.innerHTML = this.icons.volumeMute;
     } else {
-      this.volumeBtn.textContent = '🔊';
+      this.volumeBtn.innerHTML = this.icons.volume;
     }
   }
 
   toggleFullscreen() {
     if (!document.fullscreenElement) {
-      this.player.requestFullscreen().catch(err => {
+      this.player.requestFullscreen().then(() => {
+        this.fullscreenBtn.innerHTML = this.icons.fullscreenExit;
+      }).catch(err => {
         console.error(`Erreur lors du passage en plein écran: ${err.message}`);
       });
     } else {
       if (document.exitFullscreen) {
-        document.exitFullscreen();
+        document.exitFullscreen().then(() => {
+          this.fullscreenBtn.innerHTML = this.icons.fullscreen;
+        });
       }
     }
   }
