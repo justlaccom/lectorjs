@@ -706,10 +706,9 @@ class Lector {
   }
 }
 
-// Export pour les modules ES6
+// Export pour les modules et le navigateur
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
   module.exports = Lector;
 } else {
-  // Export pour le navigateur
   window.Lector = Lector;
 }
