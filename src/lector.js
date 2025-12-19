@@ -90,6 +90,7 @@ class Lector {
     this.controls.style.right = '0';
     this.controls.style.padding = '10px';
     this.controls.style.background = 'linear-gradient(transparent, rgba(0,0,0,0.7))';
+    this.controls.style.transition = 'opacity 0.3s';
     this.controls.style.zIndex = '10';
 
     // Barre de progression
@@ -112,7 +113,7 @@ class Lector {
       this.progress.style.transition = 'width 0.1s';
 
       progressContainer.appendChild(this.progress);
-      controls.appendChild(progressContainer);
+      this.controls.appendChild(progressContainer);
     }
 
     // Contrôles principaux
