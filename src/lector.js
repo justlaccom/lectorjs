@@ -712,8 +712,18 @@ class Lector {
 }
 
 // Export pour les modules et le navigateur
+const LectorExport = Lector;
+
+// Export pour CommonJS (Node.js)
 if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-  module.exports = Lector;
-} else {
-  window.Lector = Lector;
+  module.exports = LectorExport;
 }
+
+// Export pour les navigateurs
+if (typeof window !== 'undefined') {
+  window.Lector = LectorExport;
+  window.lector = LectorExport; // Alias supplémentaire au cas où
+}
+
+// Export pour les modules ES6
+export default LectorExport;

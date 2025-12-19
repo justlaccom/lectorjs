@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>LectorJS Demo</title>
-    <script src="https://cdn.jsdelivr.net/gh/justlaccom/lectorjs@v1.0.6/dist/lector.min.js"></script>
     <style>
         body { 
             font-family: Arial, sans-serif;
@@ -13,27 +12,93 @@
         .video-container {
             margin: 20px 0;
         }
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
     <h1>LectorJS Demo</h1>
-    <div id="my-video" class="video-container"></div>
+    <div id="my-video" class="video-container">
+        <div class="loading">Chargement du lecteur vidéo...</div>
+    </div>
 
+    <!-- Chargement asynchrone du script -->
     <script>
-        // Initialisation du lecteur
-        const player = new Lector('#my-video', {
-            width: '100%',
-            height: '450px',
-            colors: {
-                primary: '#2196F3',
-                secondary: '#FF4081',
-                text: '#ffffff',
-                background: '#1a1a1a'
+        function initPlayer() {
+            try {
+                // Vérification que Lector est disponible
+                if (typeof Lector === 'undefined') {
+                    throw new Error('La classe Lector n\'est pas disponible');
+                }
+
+                // Initialisation du lecteur
+                const player = new Lector('#my-video', {
+                    width: '100%',
+                    height: '450px',
+                    colors: {
+                        primary: '#2196F3',
+                        secondary: '#FF4081',
+                        text: '#ffffff',
+                        background: '#1a1a1a'
+                    }
+                });
+
+                // Configuration de la source vidéo
+                player.setSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
+                
+                // Suppression du message de chargement
+                const loadingElement = document.querySelector('.loading');
+                if (loadingElement) {
+                    loadingElement.style.display = 'none';
+                }
+                
+                return player;
+            } catch (error) {
+                console.error('Erreur lors de l\'initialisation du lecteur:', error);
+                const videoContainer = document.getElementById('my-video');
+                if (videoContainer) {
+                    videoContainer.innerHTML = `
+                        <div style="color: red; padding: 20px; border: 1px solid #ffcccc; background-color: #ffeeee;">
+                            <p>Erreur lors du chargement du lecteur vidéo :(</p>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                }
+                return null;
+            }
+        }
+
+        // Chargement du script
+        function loadScript() {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/gh/justlaccom/lectorjs@v1.0.7/dist/lector.min.js';
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Erreur lors du chargement du script LectorJS'));
+                document.head.appendChild(script);
+            });
+        }
+
+        // Initialisation après le chargement de la page
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await loadScript();
+                window.player = initPlayer();
+            } catch (error) {
+                console.error('Erreur critique:', error);
+                const videoContainer = document.getElementById('my-video');
+                if (videoContainer) {
+                    videoContainer.innerHTML = `
+                        <div style="color: red; padding: 20px; border: 1px solid #ffcccc; background-color: #ffeeee;">
+                            <p>Erreur critique lors du chargement du lecteur vidéo :(</p>
+                            <p>${error.message}</p>
+                        </div>
+                    `;
+                }
             }
         });
-
-        // Configuration de la source vidéo
-        player.setSource('https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4');
     </script>
 </body>
 </html>
